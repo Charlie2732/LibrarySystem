@@ -1,0 +1,57 @@
+﻿@page "/"
+@using LibrarySystem.Data
+@using Microsoft.EntityFrameworkCore
+@inject LibraryContext context
+
+<h1>Bibliotek - Översikt</h1>
+
+<div class="row mt-4">
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4>📚 Böcker</h4>
+            <h2>@totalBooks</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4>👤 Medlemmar</h4>
+            <h2>@totalMembers</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4>📖 Aktiva lån</h4>
+            <h2>@activeLoans</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4>⏰ Försenade lån</h4>
+            <h2>@lateLoans</h2>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private int totalBooks;
+    private int totalMembers;
+    private int activeLoans;
+    private int lateLoans;
+
+    protected override void OnInitialized()
+    {
+        totalBooks = context.Books.Count();
+        totalMembers = context.Members.Count();
+
+        activeLoans = context.Loans
+            .Count(l => l.ReturnDate == null && l.DueDate >= DateTime.Now);
+
+        lateLoans = context.Loans
+            .Count(l => l.ReturnDate == null && l.DueDate < DateTime.Now);
+    }
+}

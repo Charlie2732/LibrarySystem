@@ -1,0 +1,51 @@
+﻿@page "/members"
+@using LibrarySystem.Data
+@using LibrarySystem.Core.Models
+@using Microsoft.EntityFrameworkCore
+@inject LibraryContext Context
+
+<PageTitle>Medlemmar</PageTitle>
+
+<h1>Medlemmar</h1>
+
+@if (members == null)
+{
+    <p>Laddar medlemmar...</p>
+}
+else if (!members.Any())
+{
+    <p>Det finns inga medlemmar i databasen.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Medlems-ID</th>
+                <th>Namn</th>
+                <th>Email</th>
+                <th>Medlem sedan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in members)
+            {
+                <tr>
+                    <td>@member.MemberId</td>
+                    <td>@member.Name</td>
+                    <td>@member.Email</td>
+                    <td>@member.MemberSince.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Member>? members;
+
+    protected override async Task OnInitializedAsync()
+    {
+        members = await Context.Members.ToListAsync();
+    }
+}

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using LibrarySystem.Interfaces;
+using LibrarySystem.Core.Interfaces;
 
-namespace LibrarySystem.Models
+namespace LibrarySystem.Core.Models
 {
     public class Book : ISearchable
     {

@@ -1,0 +1,94 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+@using LibrarySystem.Data
+@using LibrarySystem.Core.Models
+@using Microsoft.EntityFrameworkCore
+@inject LibraryContext Context
+
+<PageTitle>Böcker</PageTitle>
+
+<h1>Böcker</h1>
+
+<div class="mb-3">
+    <label for="searchTerm">Sök bok</label>
+    <input id="searchTerm" class="form-control" @bind="searchTerm" @bind:event="oninput" />
+</div>
+
+<div class="mb-3">
+    <label for="sortOption">Sortera efter</label>
+    <select id="sortOption" class="form-select" @bind="sortOption">
+        <option value="title">Titel</option>
+        <option value="year">Utgivningsår</option>
+    </select>
+</div>
+
+@if (filteredBooks == null)
+{
+    <p>Laddar böcker...</p>
+}
+else if (!filteredBooks.Any())
+{
+    <p>Det finns inga böcker som matchar sökningen.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Titel</th>
+                <th>Författare</th>
+                <th>Utgivningsår</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in filteredBooks)
+            {
+                <tr>
+                    <td>@book.ISBN</td>
+                    <td>
+                        <a href="/books/@book.Id">@book.Title</a>
+                    </td>
+                    <td>@book.Author</td>
+                    <td>@book.PublishedYear</td>
+                    <td>@(book.IsAvailable ? "Tillgänglig" : "Utlånad")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Book> books = new();
+    private string searchTerm = string.Empty;
+    private string sortOption = "title";
+
+    private IEnumerable<Book> filteredBooks =>
+        SortBooks(FilterBooks());
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await Context.Books.ToListAsync();
+    }
+
+    private IEnumerable<Book> FilterBooks()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return books;
+
+        return books.Where(book =>
+            book.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            book.Author.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            book.ISBN.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private IEnumerable<Book> SortBooks(IEnumerable<Book> booksToSort)
+    {
+        return sortOption switch
+        {
+            "year" => booksToSort.OrderBy(b => b.PublishedYear),
+            _ => booksToSort.OrderBy(b => b.Title)
+        };
+    }
+}

@@ -1,5 +1,5 @@
-using LibrarySystem.Interfaces;
-using LibrarySystem.Models;
+using LibrarySystem.Core.Interfaces;
+using LibrarySystem.Core.Models;
 using Xunit;
 
 namespace LibrarySystem.Tests

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LibrarySystem.Models
+namespace LibrarySystem.Core.Models
 {
     public class Loan
     {
