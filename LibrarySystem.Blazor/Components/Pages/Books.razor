@@ -40,6 +40,7 @@ else
                 <th>Författare</th>
                 <th>Utgivningsår</th>
                 <th>Status</th>
+                <th>Åtgärd</th>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,18 @@ else
                     <td>@book.Author</td>
                     <td>@book.PublishedYear</td>
                     <td>@(book.IsAvailable ? "Tillgänglig" : "Utlånad")</td>
+                    <td>
+                        @if (book.IsAvailable)
+                        {
+                            <button class="btn btn-sm btn-danger" @onclick="() => DeleteBook(book.Id)">
+                                Ta bort
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Utlånad</span>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
@@ -90,5 +103,16 @@ else
             "year" => booksToSort.OrderBy(b => b.PublishedYear),
             _ => booksToSort.OrderBy(b => b.Title)
         };
+    }
+
+    private async Task DeleteBook(int id)
+    {
+        var book = await Context.Books.FirstOrDefaultAsync(b => b.Id == id);
+        if (book != null && book.IsAvailable)
+        {
+            Context.Books.Remove(book);
+            await Context.SaveChangesAsync();
+            books = await Context.Books.ToListAsync();
+        }
     }
 }
